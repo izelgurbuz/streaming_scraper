@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Virtual environments
+venv/
+.env/
+
+# IDE settings
+.idea/
+.vscode/
+
+# Logs
+*.log
+
+# Mac system files
+.DS_Store
+
+# Docker related
+*.pid
+*.sock
+*.tmp
+logs/
+data/
+
+# Kafka persistent data (optional)
+kafka-data/
+zookeeper-data/
+
+# Postgres & MongoDB volumes
+pg_data/
+mongo_data/
+
+# Redis data
+redis_data/
+
+# Byte-compiled / cache
+*.egg-info/
+.eggs/
+
+# Jupyter Notebook checkpoints (if you add notebooks later)
+.ipynb_checkpoints
