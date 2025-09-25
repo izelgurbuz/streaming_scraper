@@ -4,7 +4,7 @@ KAFKA_TOPIC = "news_rss"
 # You can add more feeds later
 RSS_FEEDS = [
     "https://finance.yahoo.com/rss/topstories",
-    "https://feeds.reuters.com/reuters/businessNews",
+    "https://www.coindesk.com/arc/outboundfeeds/rss/",
 ]
 USER_AGENT = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "

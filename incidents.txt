@@ -1,0 +1,14 @@
+1 - The issue happened because I was starting containers manually in Docker Desktop, causing Kafka to start before ZooKeeper was ready, which made Kafka fail and get killed. I got exited(137) but it was not OOM this time.
+Running `docker-compose down` followed by `docker-compose up -d` fixed it by starting services in the correct order and resetting stale state.
+
+
+| Command                       | Why use it                                  |
+| ----------------------------- | ------------------------------------------- |
+| `docker ps -a`                | See running & stopped containers.           |
+| `docker logs <name>`          | View container logs.                        |
+| `docker inspect <name>`       | Detailed info like exit codes, memory kill. |
+| `docker-compose down`         | Stop & reset everything cleanly.            |
+| `docker-compose up -d`        | Start services in correct order.            |
+| `docker-compose logs -f`      | Watch all logs live.                        |
+| `docker volume prune`         | Wipe old Kafka data.                        |
+| `docker exec -it <name> bash` | Jump inside a container for manual checks.  |
