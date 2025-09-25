@@ -1,0 +1,20 @@
+POSTGRES - you have to run this to create table first
+- `docker exec -it streaming_scraper-postgres-1 psql -U app -d streamdb`
+CREATE TABLE IF NOT EXISTS news_history (
+    id SERIAL PRIMARY KEY,
+    headline_id VARCHAR(64) UNIQUE NOT NULL,
+    title TEXT NOT NULL,
+    link TEXT NOT NULL,
+    pub_date TIMESTAMP,
+    source TEXT NOT NULL,
+    ingested_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+MONGO - you don't have to create table beforehand for Mongo, these commands are just to take a glance
+- `docker exec -it streaming_scraper-mongo-1 mongosh`
+
+use streamdb
+show collections
+db.news.find().pretty()
+
+
