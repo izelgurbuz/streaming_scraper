@@ -7,7 +7,7 @@ from config import KAFKA_BOOTSTRAP_SERVERS, KAFKA_TOPIC
 
 DB_CONFIG = {
     "host": "localhost",
-    "port": 5432,
+    "port": 5555,
     "dbname": "streamdb",
     "user": "app",
     "password": "app",
