@@ -63,7 +63,7 @@ services:
       POSTGRES_PASSWORD: app
       POSTGRES_DB: streamdb
     ports:
-      - "5432:5432"
+      - "5555:5432"
 
   mongo:
     image: mongo:7
@@ -74,3 +74,78 @@ services:
     image: redis:7
     ports:
       - "6379:6379"
+
+  mailhog:
+    image: mailhog/mailhog
+    platform: linux/amd64
+    ports:
+      - "8025:8025" # Web UI for emails
+      - "1025:1025"
+
+  airflow-webserver:
+    image: apache/airflow:2.9.3
+    restart: always
+    depends_on:
+      - postgres
+      - redis
+      - airflow-scheduler
+    environment:
+      # The scheduler runs everything inside the same container or machine
+      # It launches subprocesses (forks) directly on the host to execute tasks
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      #Airflow internally uses SQLAlchemy
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://app:app@postgres:5432/streamdb
+      # Key for encrypting connections/variables (must be a valid Fernet key in prod)
+      # Encrypts sensitive data (passwords, secrets) in Airflow’s metadata DB - connections
+      # AIRFLOW__CORE__FERNET_KEY: "32 bit keyy"
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
+      AIRFLOW__SMTP__SMTP_HOST: mailhog
+      AIRFLOW__SMTP__SMTP_PORT: 1025
+      AIRFLOW__SMTP__SMTP_MAIL_FROM: airflow@example.com
+      AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_SECRET_KEY}
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "8081:8080"
+    command: webserver # <-- REQUIRED !!!, tells Airflow to start its webserver
+
+  airflow-scheduler:
+    image: apache/airflow:2.9.3
+    restart: always
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://app:app@postgres:5432/streamdb
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
+      AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_SECRET_KEY}
+    volumes:
+      - ./dags:/opt/airflow/dags
+    command: scheduler
+
+  airflow-init:
+    image: apache/airflow:2.9.3
+    entrypoint: /bin/bash
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://app:app@postgres:5432/streamdb
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
+
+    command:
+      - -c
+      - |
+        airflow db init &&
+        airflow users create \
+          --username admin \
+          --password admin \
+          --firstname Izel \
+          --lastname Admin \
+          --role Admin \
+          --email admin@example.com
+    depends_on:
+      - postgres
