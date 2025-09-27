@@ -5,9 +5,10 @@ __pycache__/
 *.pyd
 *.so
 
-# Virtual environments
+# Virtual environments 
 venv/
 .env/
+/.env
 
 # IDE settings
 .idea/

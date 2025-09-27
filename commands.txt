@@ -17,4 +17,16 @@ use streamdb
 show collections
 db.news.find().pretty()
 
+REDIS
+- `docker exec -it streaming_scraper-redis-1 redis-cli`
+SELECT 1 -- switch to db=1
+DBSIZE -- how many keys in current db
+FLUSHDB
+FLUSHALL
+
+- SLACK CONNECTION - you have to add run it if you don't add slack webhook connection on airflow ui
+docker exec -it streaming_scraper-airflow-webserver-1 \
+  airflow connections add slack_default \
+  --conn-type slackwebhook \
+  --conn-password "T000/B000/XXXXXXXX"
 
