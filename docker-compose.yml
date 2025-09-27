@@ -64,6 +64,8 @@ services:
       POSTGRES_DB: streamdb
     ports:
       - "5555:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
   mongo:
     image: mongo:7
@@ -74,13 +76,6 @@ services:
     image: redis:7
     ports:
       - "6379:6379"
-
-  mailhog:
-    image: mailhog/mailhog
-    platform: linux/amd64
-    ports:
-      - "8025:8025" # Web UI for emails
-      - "1025:1025"
 
   airflow-webserver:
     image: apache/airflow:2.9.3
@@ -100,10 +95,17 @@ services:
       # Encrypts sensitive data (passwords, secrets) in Airflow’s metadata DB - connections
       # AIRFLOW__CORE__FERNET_KEY: "32 bit keyy"
       AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
-      AIRFLOW__SMTP__SMTP_HOST: mailhog
-      AIRFLOW__SMTP__SMTP_PORT: 1025
-      AIRFLOW__SMTP__SMTP_MAIL_FROM: airflow@example.com
+
+      AIRFLOW__SMTP__SMTP_HOST: smtp.gmail.com
+      AIRFLOW__SMTP__SMTP_PORT: 587
+      AIRFLOW__SMTP__SMTP_STARTTLS: "True"
+      AIRFLOW__SMTP__SMTP_SSL: "False"
+      AIRFLOW__SMTP__SMTP_USER: ${GMAIL_USER}
+      AIRFLOW__SMTP__SMTP_PASSWORD: ${GMAIL_PASS}
+      AIRFLOW__SMTP__SMTP_MAIL_FROM: ${GMAIL_USER}
+
       AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_SECRET_KEY}
+
     volumes:
       - ./dags:/opt/airflow/dags
       - /etc/localtime:/etc/localtime:ro
@@ -122,7 +124,17 @@ services:
       AIRFLOW__CORE__LOAD_EXAMPLES: "false"
       AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql+psycopg2://app:app@postgres:5432/streamdb
       AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
+
+      AIRFLOW__SMTP__SMTP_HOST: smtp.gmail.com
+      AIRFLOW__SMTP__SMTP_PORT: 587
+      AIRFLOW__SMTP__SMTP_STARTTLS: "True"
+      AIRFLOW__SMTP__SMTP_SSL: "False"
+      AIRFLOW__SMTP__SMTP_USER: ${GMAIL_USER}
+      AIRFLOW__SMTP__SMTP_PASSWORD: ${GMAIL_PASS}
+      AIRFLOW__SMTP__SMTP_MAIL_FROM: ${GMAIL_USER}
+
       AIRFLOW__WEBSERVER__SECRET_KEY: ${AIRFLOW_SECRET_KEY}
+
     volumes:
       - ./dags:/opt/airflow/dags
     command: scheduler
@@ -149,3 +161,6 @@ services:
           --email admin@example.com
     depends_on:
       - postgres
+
+volumes:
+  postgres_data:
