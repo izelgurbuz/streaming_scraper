@@ -141,6 +141,9 @@ In Airflow UI → unpause news_alerts → hit “Trigger DAG.”
 
 If matches found → you’ll see Slack/Gmail alerts.
 
+<img width="2088" height="566" alt="Screenshot 2025-09-27 at 19 17 55" src="https://github.com/user-attachments/assets/b5670408-6f36-46d2-97ef-fe3fbb2c3d44" />
+
+
 ### 🐛 What went wrong (aka lessons learned)
 
 Gmail SMTP → ConnectionRefusedError until I realized the scheduler (not just the webserver) needs the SMTP env vars.
