@@ -25,7 +25,7 @@ def choose_path(**context):
     matches = context["ti"].xcom_pull(task_ids="check_headlines")
     if matches and len(matches) > 0:
         print(f"Found {len(matches)} relevant headlines.")
-        return "alert_path"
+        return ["send_slack_alert", "send_email_summary"]
     return "no_alert_path"
 
 
@@ -59,11 +59,9 @@ with DAG(
         html_content="<h3>Check Slack for detailed alerts.</h3>",
     )
 
-    alert_path = [slack_alert, send_email]
-
     no_alert_path = EmptyOperator(task_id="no_alert_path")
 
     # DAG Flow
     check_task >> branch_task
-    branch_task >> alert_path
+    branch_task >> [slack_alert, send_email]
     branch_task >> no_alert_path
